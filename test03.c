@@ -20,7 +20,6 @@ int value = 0;
 void thread1(void *v)
 {
     fprintf(stderr, "thread1 started up\n");
-
     ta_lock(&mutex);
     ta_yield();
     while (value == 0)
@@ -67,14 +66,12 @@ int main(int argc, char **argv)
 
     ta_lock_init(&mutex);
     ta_cond_init(&condv);
-
     ta_create(thread1, NULL);
     ta_create(thread2, NULL);
 
     int rv = ta_waitall();
     assert(rv == 0);
     assert(value == 42);
-
     ta_lock_destroy(&mutex);
     ta_cond_destroy(&condv);
 

@@ -1,24 +1,28 @@
 /*
- * 
+ * Anindya Guha
  */
 
 #ifndef __THREADSALIVE_H__
 #define __THREADSALIVE_H__
+
+#include <ucontext.h>
+#include "list.h"
 
 /* ***************************
         type definitions
    *************************** */
 
 typedef struct {
-
+    int value;
+    Node *queue;
 } tasem_t;
 
 typedef struct {
-
+    tasem_t sem;
 } talock_t;
 
 typedef struct {
-
+    Node *queue;
 } tacond_t;
 
 

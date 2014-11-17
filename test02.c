@@ -30,7 +30,7 @@ void killerthr(void *arg)
     }
     stop = 1;
 }
-
+    
 void reader(void *arg)
 {
     int tid = (int)arg;
@@ -98,10 +98,8 @@ int main(int argc, char **argv)
         ta_create(reader, (void *)i);
         ta_create(writer, (void *)i);
     }
-
     int rv = ta_waitall();
     assert(rv == 0);
-
     ta_sem_destroy(&readersem);
     ta_sem_destroy(&writersem);
     ta_lock_destroy(&rmutex);
