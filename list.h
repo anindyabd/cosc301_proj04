@@ -3,13 +3,13 @@
 
 #include <ucontext.h>
 
-
 typedef struct node {
     ucontext_t ctx;
+    int must_reacquire; // does this thread need to reacquire a lock? 1 if yes, 0 if no.
     struct node *next;
 } Node;
 
-void list_append(ucontext_t ctx, Node **head);
+void list_append(ucontext_t ctx, int must_reacquire, Node **head);
 void list_clear(Node *list);
 void list_remove(struct node **head);
 ucontext_t* get_last(Node *head);

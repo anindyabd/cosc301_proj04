@@ -5,7 +5,9 @@
 #include <assert.h>
 #include <strings.h>
 #include <string.h>
+#include <ucontext.h>
 #include "list.h"
+
 
 /* ***************************** 
      linked list library functions
@@ -19,9 +21,10 @@ void list_clear(Node *list) {
     }
 }
 
-void list_append(ucontext_t ctx, Node **head) {
+void list_append(ucontext_t ctx, int must_reacquire, Node **head) {
     Node *newnode = malloc(sizeof(Node));
     newnode->ctx = ctx;
+    newnode->must_reacquire = must_reacquire;
     newnode->next = NULL;
     struct node *curr = *head;
     if (curr == NULL) {

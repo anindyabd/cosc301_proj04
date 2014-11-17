@@ -26,6 +26,12 @@ typedef struct {
 } tacond_t;
 
 
+typedef struct mutex_node {
+    talock_t *mutex;
+    struct mutex_node *next;
+} mutex_list_node;
+
+
 /* ***************************
        stage 1 functions
    *************************** */
@@ -56,5 +62,14 @@ void ta_cond_init(tacond_t *);
 void ta_cond_destroy(tacond_t *);
 void ta_wait(talock_t *, tacond_t *);
 void ta_signal(tacond_t *);
+
+/* **************************
+    Mutex Linked List functions 
+
+  ************************** */
+
+void mutex_list_clear(mutex_list_node *list); 
+void mutex_list_append(talock_t *mutex, mutex_list_node **head);
+void mutex_list_remove(mutex_list_node **head);
 
 #endif /* __THREADSALIVE_H__ */
