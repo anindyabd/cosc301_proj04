@@ -59,6 +59,10 @@ void ta_yield(void) {
     list_append(actx, 0, &ready_queue);
     ucontext_t* ctx = get_last(ready_queue);
     ucontext_t toswitch = ready_queue->ctx;
+    if (ready_queue->must_reacquire) {  
+        ta_lock(cond_mutex_list->mutex); 
+        mutex_list_remove(&cond_mutex_list); 
+    }
     list_remove(&ready_queue);
     swapcontext(&(*ctx), &toswitch);
 }
@@ -72,11 +76,11 @@ int ta_waitall(void) {
         /* if ready_queue->must_reacquire is 1, that means that this 
         particular thread was woken from a condition variable, and must
         reacquire the lock. Clearly, I am not creative with naming. */
-        if (ready_queue->must_reacquire == 1) { 
+        if (ready_queue->must_reacquire) { 
             /* this "parent thread" reacquires the lock, and not the thread itself,
              but that doesn't matter. The lock is held when the  
              thread that needs the lock runs, so this is correct, in the sense
-             that the thread has the lock.
+             that the thread has the lock. For all practical purposes this should work correctly.
              This is done for simplicity's sake. */
             ta_lock(cond_mutex_list->mutex); 
             mutex_list_remove(&cond_mutex_list);
@@ -84,8 +88,7 @@ int ta_waitall(void) {
         list_remove(&ready_queue);
         ctx.uc_link = &parent_ctx;
         swapcontext(&parent_ctx, &ctx);
-    }
-    mutex_list_clear(cond_mutex_list);
+    }   
     list_clear(all);
     return -num_blocked_threads;
 }
@@ -128,9 +131,7 @@ void ta_sem_wait(tasem_t *sem) {
         num_blocked_threads++;
         swapcontext(&(*ctx), &toswitch);
     }
-    else {
-        sem->value--;
-    }
+    sem->value--;
 }
 
 void ta_lock_init(talock_t *mutex) {
@@ -174,7 +175,7 @@ void ta_wait(talock_t *mutex, tacond_t *cond) {
     ucontext_t toswitch = ready_queue->ctx;
     list_remove(&ready_queue);
     num_blocked_threads++;
-    swapcontext(&(*ctx), &toswitch);
+    swapcontext(&(*ctx), &toswitch);  
 }
 
 void ta_signal(tacond_t *cond) {

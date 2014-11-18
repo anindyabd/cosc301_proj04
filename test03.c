@@ -39,7 +39,6 @@ void thread1(void *v)
 void thread2(void *v)
 {
     fprintf(stderr, "thread2 started up\n");
-
     ta_lock(&mutex);
     ta_yield();
     fprintf(stderr, "thread2 not updating value, signalling thread1\n");
