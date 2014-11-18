@@ -122,7 +122,7 @@ void ta_sem_post(tasem_t *sem) {
 
 void ta_sem_wait(tasem_t *sem) {
     assert(sem->value > -1);
-    if (sem->value == 0) {
+    while (sem->value == 0) {
         ucontext_t actx;
         list_append(actx, 0, &sem->queue);
         ucontext_t* ctx = get_last(sem->queue);
